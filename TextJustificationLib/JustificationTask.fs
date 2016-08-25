@@ -66,6 +66,18 @@ type SqlClrQuery =
 
      let sqlCom = SqlCommand(String.Concat("Select '",final_string, "'"))
      SqlContext.Pipe.ExecuteAndSend sqlCom
+
+ type SqlClrFunc =
+   static member GetJustifiedTextFunc (text:string) (line_width:int) =
+     let string_list = text.Split(' ') |> Array.toList
+     let res = JustificationTask.create_unjustified_list string_list line_width line_width []
+     let revList = List.rev res
+     let revListFinal = revList |> List.filter(fun (x, string) -> string.Length = 40) 
+     let final_string = JustificationTask.justify_list revList "" line_width
+     match final_string.Length with
+     | 0 -> ""
+     | _ -> final_string
+     
      
      
 

@@ -1,4 +1,10 @@
-﻿-- First, drop everything in backwards order
+﻿ALTER DATABASE [DATABASE_NAME] SET trustworthy ON
+
+DROP  FUNCTION GetJustifiedTextFunc
+
+GO
+
+-- First, drop everything in backwards order
 IF  EXISTS (SELECT * FROM sys.procedures procs WHERE procs.name = N'GetJustifiedText')
 	DROP PROCEDURE [dbo].[GetJustifiedText]
 GO
@@ -14,7 +20,7 @@ GO
 -- Now, create everything in forwards order
 CREATE ASSEMBLY FSCore FROM 'C:\Users\mark.atkinson\Source\Repos\TextJustificationLib\TextJustificationLib\bin\Debug\FSharp.Core.dll' WITH PERMISSION_SET = UNSAFE
 GO
-CREATE ASSEMBLY SqlClr FROM 'C:\Users\mark.atkinson\Source\Repos\TextJustificationLib\TextJustificationLib\bin\Debug\TextJustificationLib.dll'
+CREATE ASSEMBLY TextJustificationLib FROM 'C:\Users\mark.atkinson\Source\Repos\TextJustificationLib\TextJustificationLib\bin\Debug\TextJustificationLib.dll'
 GO
  
 -- External name is [SqlAssemblyName].[Full typename].[Method name]
@@ -25,3 +31,11 @@ WITH EXECUTE AS CALLER
 AS
 EXTERNAL NAME [TextJustificationLib].[TextJustificationLib.SqlClrQuery].[GetJustifiedText]
 GO
+
+
+CREATE FUNCTION GetJustifiedTextFunc(@text [nvarchar](max),
+									  @line_width [int]) RETURNS NVARCHAR(MAX)   
+AS
+EXTERNAL NAME [TextJustificationLib].[TextJustificationLib.SqlClrFunc].[GetJustifiedTextFunc]
+GO
+
